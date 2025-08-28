@@ -1,7 +1,7 @@
 export function EventMeta() {
   return (
-    <div className="text-center py-8 px-4">
-      <div className="inline-flex items-center justify-center gap-3 sm:gap-6 text-4xl sm:text-5xl lg:text-6xl font-black leading-none">
+    <div className="text-center py-2 sm:py-8 sm:px-4 px-2">
+      <div className="inline-flex items-center justify-center gap-3 sm:gap-6 text-md sm:text-5xl lg:text-5xl font-black leading-none">
         {/* Time */}
         <span className="text-gradient-red">07:30 AM</span>
 

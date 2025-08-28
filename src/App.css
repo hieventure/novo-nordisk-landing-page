@@ -40,3 +40,24 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Mobile responsive hero section */
+@media (max-width: 767px) {
+  .hero-bg-mobile {
+    background-size: 100% auto !important;
+    background-position: center bottom !important;
+    min-height: 100vh;
+  }
+
+  .hero-content-mobile {
+    padding-top: 2rem;
+    padding-bottom: 20vh;
+  }
+}
+
+@media (min-width: 768px) {
+  .hero-bg-desktop {
+    background-size: clamp(540px, 38vw, 600px) auto !important;
+    background-position: right -16px top !important;
+  }
+}

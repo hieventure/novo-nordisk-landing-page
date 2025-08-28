@@ -19,7 +19,7 @@ export function QRSection({ qrCaption }: QRSectionProps) {
       </div>
 
       {/* Caption */}
-      <p className="text-ozempic-qr text-ozempic-dark max-w-md mx-auto leading-relaxed max-w-[250px] font-bold text-sm">
+      <p className="text-ozempic-qr text-ozempic-dark max-w-md mx-auto leading-relaxed max-w-[250px] font-bold text-sm px-6">
         {qrCaption}
       </p>
     </div>

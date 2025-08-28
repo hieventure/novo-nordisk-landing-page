@@ -15,7 +15,7 @@ export function MapCard({ venue }: MapCardProps) {
     <div className="w-full max-w-[775px] mx-auto px-4 sm:px-8">
       {/* Map container with rounded outline */}
       <div
-        className="relative rounded-[28px] px-[30px] py-[16px] bg-white/20 ring-1 ring-white/60 backdrop-blur-[2px] cursor-pointer transition-transform hover:scale-[1.01]"
+        className="relative rounded-[28px] px-4 sm:px-[30px] py-[16px] bg-white/20 ring-1 ring-white/60 backdrop-blur-[2px] cursor-pointer transition-transform hover:scale-[1.01]"
         onClick={handleMapClick}
         role="button"
         tabIndex={0}

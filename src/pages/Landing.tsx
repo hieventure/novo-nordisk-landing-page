@@ -5,7 +5,6 @@ import { CTAGroup } from '@/components/CTAGroup';
 import { Disclaimer } from '@/components/Disclaimer';
 import { QRSection } from '@/components/QRSection';
 import { eventData } from '@/content/event';
-import heroImageTextLeft from '@/assets/banner-hero-text.png';
 import backgroundDesktop from '@/assets/bg-desktop.png';
 import { Countdown } from '@/components/Countdown';
 import uspImage from '@/assets/usp-image.png';

@@ -1,5 +1,3 @@
-import mapImage from '@/assets/map-image.png';
-
 interface MapCardProps {
   venue: {
     name: string;

@@ -1,7 +1,7 @@
 import novoNordiskLogo from '@/assets/novo-nordisk-logo.png';
 import ozempicLogo from '@/assets/ozempic-logo.png';
 
-export function HeaderLogos({ isMobile }: { isMobile?: boolean }) {
+export function HeaderLogos() {
   return (
     <header className="flex items-center  gap-4 sm:gap-[3.75rem] px-4 pt-8 pb-8 sm:px-8 lg:px-16">
       <img

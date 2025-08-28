@@ -71,7 +71,7 @@ export function Landing() {
           {/* Mobile Container with max-width only for very large screens */}
           <div className="2xl:max-w-[1140px] 2xl:mx-auto px-8">
             {/* Header - Always at top */}
-            <HeaderLogos isMobile={true} />
+            <HeaderLogos />
 
             {/* Hero Content - Responsive Layout */}
             <div className="relative mb-2">

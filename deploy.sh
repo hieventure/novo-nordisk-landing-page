@@ -27,4 +27,8 @@ pnpm build
 echo "🔑 Set quyền cho Nginx..."
 chown -R www-data:www-data $DEPLOY_DIR
 
-echo "✅ Deploy hoàn tất! Vui lòng reload Nginx nếu cần."
+# Reload Nginx
+echo "🔄 Reload Nginx..."
+sudo systemctl restart nginx
+
+echo "✅ Deploy hoàn tất! "

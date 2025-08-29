@@ -43,8 +43,8 @@ export function Landing() {
                     alt={eventData.title}
                     className="w-full max-w-[520px] md:max-w-[640px] lg:max-w-[760px] xl:max-w-[860px] mb-[40px]"
                   />
-                  <p className="text-ozempic-teal text-3xl  font-bold italic mb-[40px]">
-                    Một tuần 1 lần - bảo vệ đa cơ thể
+                  <p className="text-ozempic-teal text-2xl  font-bold italic mb-[40px]">
+                    1 LẦN/TUẦN - KIỂM SOÁT ĐA MỤC TIÊU
                   </p>
                   <img
                     src={uspImage}

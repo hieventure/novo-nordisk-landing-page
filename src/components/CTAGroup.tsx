@@ -31,6 +31,11 @@ export function CTAGroup({ labels, rsvpUrl }: CTAGroupProps) {
     const isMacOS = /Macintosh/.test(ua) && !(navigator as any).maxTouchPoints; // desktop mac
     const isSafari = /Safari/.test(ua) && !/Chrome/.test(ua);
 
+    // In-app browser detection
+    const isFacebookBrowser = /FBAN|FBAV|FB_IAB/.test(ua);
+    const isInAppBrowser = isFacebookBrowser || /Instagram|WhatsApp|Line|WeChat|TikTok/.test(ua);
+    const isMessengerBrowser = /FB_IAB/.test(ua) || /Messenger/.test(ua);
+
     // Event data used for both flows
     const start = formatGoogleDate(eventData.startDateTime);
     const end = formatGoogleDate(eventData.endDateTime);
@@ -49,6 +54,17 @@ export function CTAGroup({ labels, rsvpUrl }: CTAGroupProps) {
       const googleUrl = `https://calendar.google.com/calendar/render?${params.toString()}`;
       const win = window.open(googleUrl, '_blank', 'noopener,noreferrer');
       return !!win;
+    };
+
+    const handleInAppBrowser = () => {
+      // For in-app browsers, show instructions to open in external browser
+      const instructions = `To add this event to your calendar, please:\n\n1. Open this link in Safari or Chrome\n2. Tap "Save the Date" again\n\nEvent Details:\n📅 ${title}\n📍 ${location}\n🕰️ October 12, 2025 at 7:30 AM (Vietnam time)`;
+
+      if (confirm(instructions + '\n\nWould you like to open in external browser now?')) {
+        // Try to open in external browser
+        const currentUrl = window.location.href;
+        window.open(currentUrl, '_blank', 'noopener,noreferrer');
+      }
     };
 
     const downloadAppleICS = () => {
@@ -99,6 +115,12 @@ export function CTAGroup({ labels, rsvpUrl }: CTAGroupProps) {
         downloadICS(event, 'ozempic-the-power-of-less.ics');
       }
     };
+
+    // Handle in-app browsers first (they have limited functionality)
+    if (isInAppBrowser) {
+      handleInAppBrowser();
+      return;
+    }
 
     if (isIOS) {
       // iOS - Use native calendar directly (better user experience)

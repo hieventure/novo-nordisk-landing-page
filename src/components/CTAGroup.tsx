@@ -34,7 +34,6 @@ export function CTAGroup({ labels, rsvpUrl }: CTAGroupProps) {
     // In-app browser detection
     const isFacebookBrowser = /FBAN|FBAV|FB_IAB/.test(ua);
     const isInAppBrowser = isFacebookBrowser || /Instagram|WhatsApp|Line|WeChat|TikTok/.test(ua);
-    const isMessengerBrowser = /FB_IAB/.test(ua) || /Messenger/.test(ua);
 
     // Event data used for both flows
     const start = formatGoogleDate(eventData.startDateTime);

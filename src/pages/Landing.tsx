@@ -27,7 +27,7 @@ export function Landing() {
       {!isMobileView && (
         <section className="relative overflow-hidden min-h-[680px] md:min-h-[720px] xl:min-h-[800px]">
           {/* Hero Content Container - Max width only for very large screens (2xl+) */}
-          <div className="2xl:max-w-[1200px] 2xl:mx-auto flex flex-row relative pt-6 md:pt-8">
+          <div className="w-full 3xl:max-w-[1200px] 2xl:mx-auto flex flex-row relative pt-6 md:pt-8">
             {/* Hero Content Positioned in Left Side */}
             <div className="relative z-10 flex items-start flex-col start w-[50%] gap-16">
               {/* Header */}
@@ -56,11 +56,7 @@ export function Landing() {
             </div>
 
             <div className="w-[50%]">
-              <img
-                src={keyartImage}
-                alt={eventData.title}
-                className="w-full max-w-[520px] md:max-w-[640px] lg:max-w-[760px] xl:max-w-[860px]"
-              />
+              <img src={keyartImage} alt={eventData.title} className="w-full" />
             </div>
           </div>
         </section>

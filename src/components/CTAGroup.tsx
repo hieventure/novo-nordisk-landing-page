@@ -1,4 +1,4 @@
-import { downloadICS } from '@/lib/ics';
+import { downloadICS, generateICS } from '@/lib/ics';
 import { eventData } from '@/content/event';
 interface CTAGroupProps {
   labels: {
@@ -29,7 +29,7 @@ export function CTAGroup({ labels, rsvpUrl }: CTAGroupProps) {
       /iPad|iPhone|iPod/.test(ua) ||
       (navigator.platform === 'MacIntel' && (navigator as any).maxTouchPoints > 1);
     const isMacOS = /Macintosh/.test(ua) && !(navigator as any).maxTouchPoints; // desktop mac
-    const isApple = isIOS || isMacOS;
+    const isSafari = /Safari/.test(ua) && !/Chrome/.test(ua);
 
     // Event data used for both flows
     const start = formatGoogleDate(eventData.startDateTime);
@@ -54,16 +54,57 @@ export function CTAGroup({ labels, rsvpUrl }: CTAGroupProps) {
     const downloadAppleICS = () => {
       const event = {
         title,
-        description: `\n${details}`,
+        description: details,
         location,
         startDateTime: eventData.startDateTime,
         endDateTime: eventData.endDateTime,
       };
-      downloadICS(event, 'ozempic-the-power-of-less.ics');
+
+      // For iOS Safari, try multiple approaches
+      if (isIOS && isSafari) {
+        try {
+          // Method 1: Try webcal:// URL for iOS
+          const icsContent = generateICS(event);
+          const blob = new Blob([icsContent], { type: 'text/calendar' });
+          const url = URL.createObjectURL(blob);
+
+          // Create a temporary link element
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'ozempic-event.ics';
+          link.target = '_blank';
+          link.rel = 'noopener';
+
+          // Trigger click
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          // Clean up
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+        } catch (error) {
+          console.log('iOS calendar method failed, trying Google Calendar fallback');
+          // Fallback to Google Calendar
+          const opened = openGoogle();
+          if (!opened) {
+            alert(
+              'Please manually add this event to your calendar:\n\nTitle: ' +
+                title +
+                '\nDate: October 12, 2025 at 7:30 AM\nLocation: ' +
+                location
+            );
+          }
+        }
+      } else {
+        downloadICS(event, 'ozempic-the-power-of-less.ics');
+      }
     };
 
-    if (isApple) {
-      // Apple Calendar (iOS/macOS) -> use ICS
+    if (isIOS) {
+      // iOS - Use native calendar directly (better user experience)
+      downloadAppleICS();
+    } else if (isMacOS) {
+      // macOS - Use ICS download
       downloadAppleICS();
     } else {
       // Other platforms -> prefer Google Calendar; fallback to ICS if blocked

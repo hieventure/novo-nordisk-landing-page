@@ -10,7 +10,7 @@ export const eventData = {
   // Venue
   venue: {
     name: 'Thiskyhall Sala',
-    address: 'Tầng 5 - 10 D. Mai Chí Thọ, Phường An Khánh, Thủ Đức, Hồ Chí Minh',
+    address: 'Tầng 5 - 10 Đ. Mai Chí Thọ, Phường An Khánh, Thủ Đức, Hồ Chí Minh',
     googleMapsUrl: 'https://maps.google.com/?q=Thiskyhall+Sala+Mai+Chi+Tho+Thu+Duc+Ho+Chi+Minh',
   },
 

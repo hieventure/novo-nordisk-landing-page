@@ -125,7 +125,7 @@ export function Landing() {
             <span className="text-2xl sm:text-3xl lg:text-4xl font-bold">Thiskyhall Sala</span>
           </div>
           <p className="text-lg sm:text-xl text-ozempic-gray max-w-3xl mx-auto leading-relaxed font-medium italic">
-            Tầng 5 - 10 D. Mai Chí Thọ, Phường An Khánh, Thủ Đức, Hồ Chí Minh
+            Tầng 5 - 10 Đ. Mai Chí Thọ, Phường An Khánh, Thủ Đức, Hồ Chí Minh
           </p>
         </section>
 

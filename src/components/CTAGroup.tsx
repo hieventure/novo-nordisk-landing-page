@@ -81,7 +81,7 @@ export function CTAGroup({ labels, rsvpUrl }: CTAGroupProps) {
       {/* Save the Date CTA */}
       <button
         onClick={handleSaveTheDate}
-        className="group relative bg-cta-gradient text-white font-extrabold text-sm sm:text-xl lg:text-ozempic-cta px-4 sm:px-8 py-4 sm:px-12 sm:py-5 rounded-full shadow-cta-inner border border-white/40 transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-gradient-orange/50 min-w-[120px] sm:min-w-[320px] w-[50%]"
+        className="group relative bg-cta-gradient text-white font-extrabold text-xs sm:text-xl lg:text-ozempic-cta px-4 sm:px-8 py-4 sm:px-12 sm:py-5 rounded-full shadow-cta-inner border border-white/40 transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-gradient-orange/50 min-w-[120px] sm:min-w-[320px] w-[50%]"
         aria-label="Download calendar event for The Power of Less"
       >
         {labels.saveTheDate}
@@ -90,7 +90,7 @@ export function CTAGroup({ labels, rsvpUrl }: CTAGroupProps) {
       {/* Confirm Attendance CTA */}
       <button
         onClick={handleConfirmAttendance}
-        className="group relative bg-cta-gradient text-white font-bold text-sm sm:text-xl lg:text-ozempic-cta px-4 sm:px-8 py-4 sm:px-12 sm:py-5 rounded-full shadow-cta-inner border border-white/40 transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-gradient-red/50 min-w-[120px] sm:min-w-[320px] uppercase w-[50%]"
+        className="group relative bg-cta-gradient text-white font-bold text-xs sm:text-xl lg:text-ozempic-cta px-4 sm:px-8 py-4 sm:px-12 sm:py-5 rounded-full shadow-cta-inner border border-white/40 transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-gradient-red/50 min-w-[120px] sm:min-w-[320px] uppercase w-[50%]"
         aria-label="Confirm attendance for The Power of Less event"
       >
         {labels.confirmAttendance}

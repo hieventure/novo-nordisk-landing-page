@@ -27,7 +27,7 @@ export function Landing() {
       {!isMobileView && (
         <section className="relative overflow-hidden min-h-[680px] md:min-h-[720px] xl:min-h-[800px]">
           {/* Hero Content Container - Max width only for very large screens (2xl+) */}
-          <div className="2xl:max-w-[1140px] 2xl:mx-auto flex flex-row relative pt-6 md:pt-8">
+          <div className="2xl:max-w-[1200px] 2xl:mx-auto flex flex-row relative pt-6 md:pt-8">
             {/* Hero Content Positioned in Left Side */}
             <div className="relative z-10 flex items-start flex-col start w-[50%] gap-16">
               {/* Header */}
@@ -69,7 +69,7 @@ export function Landing() {
       {isMobileView && (
         <>
           {/* Mobile Container with max-width only for very large screens */}
-          <div className="2xl:max-w-[1140px] 2xl:mx-auto px-8">
+          <div className="2xl:max-w-[1200px] 2xl:mx-auto px-8">
             {/* Header - Always at top */}
             <HeaderLogos />
 
@@ -106,7 +106,7 @@ export function Landing() {
       )}
 
       {/* Content Container - Max width only for very large screens (2xl+) */}
-      <div className="2xl:max-w-[1140px] 2xl:mx-auto px-4">
+      <div className="2xl:max-w-[1200px] 2xl:mx-auto px-4">
         <section className="py-6 md:py-8">
           <Countdown targetDate={eventData.startDateTime} timezone={eventData.timezone} />
         </section>

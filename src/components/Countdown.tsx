@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 interface CountdownProps {
   targetDate: string; // ISO string
   timezone: string;
+  language: string;
 }
 
 interface TimeLeft {
@@ -12,7 +13,7 @@ interface TimeLeft {
   seconds: number;
 }
 
-export function Countdown({ targetDate }: CountdownProps) {
+export function Countdown({ targetDate, language }: CountdownProps) {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0 });
   const [isExpired, setIsExpired] = useState(false);
 
@@ -45,7 +46,9 @@ export function Countdown({ targetDate }: CountdownProps) {
   if (isExpired) {
     return (
       <div className="text-center py-8">
-        <p className="text-2xl font-bold text-ozempic-teal">Sự kiện đã bắt đầu!</p>
+        <p className="text-2xl font-bold text-ozempic-teal">
+          {language === 'vi' ? 'Sự kiện đã bắt đầu!' : 'Event started!'}
+        </p>
       </div>
     );
   }
@@ -54,10 +57,10 @@ export function Countdown({ targetDate }: CountdownProps) {
     <div className="text-center">
       {/* Countdown display */}
       <div className="flex justify-center items-center gap-3 sm:gap-6 md:gap-8 lg:gap-12 px-4">
-        <TimeUnit value={timeLeft.days} label="NGÀY" />
-        <TimeUnit value={timeLeft.hours} label="GIỜ" />
-        <TimeUnit value={timeLeft.minutes} label="PHÚT" />
-        <TimeUnit value={timeLeft.seconds} label="GIÂY" />
+        <TimeUnit value={timeLeft.days} label={language === 'vi' ? 'NGÀY' : 'DAYS'} />
+        <TimeUnit value={timeLeft.hours} label={language === 'vi' ? 'GIỜ' : 'HOURS'} />
+        <TimeUnit value={timeLeft.minutes} label={language === 'vi' ? 'PHÚT' : 'MINUTES'} />
+        <TimeUnit value={timeLeft.seconds} label={language === 'vi' ? 'GIÂY' : 'SECONDS'} />
       </div>
     </div>
   );

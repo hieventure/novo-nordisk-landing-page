@@ -1,10 +1,7 @@
 import qrCode from '@/assets/qr-code.png';
+import qrCodeCaption from '@/assets/qr-code-caption.png';
 
-interface QRSectionProps {
-  qrCaption: string;
-}
-
-export function QRSection({ qrCaption }: QRSectionProps) {
+export function QRSection() {
   return (
     <div className="text-center">
       {/* QR Code */}
@@ -19,9 +16,12 @@ export function QRSection({ qrCaption }: QRSectionProps) {
       </div>
 
       {/* Caption */}
-      <p className="text-ozempic-qr text-ozempic-dark max-w-md mx-auto leading-relaxed max-w-[250px] font-bold text-sm px-6">
+      {/* <p className="text-ozempic-qr text-ozempic-dark max-w-md mx-auto leading-relaxed max-w-[250px] font-bold text-sm px-6">
         {qrCaption}
-      </p>
+      </p> */}
+      <div className="flex justify-center">
+        <img src={qrCodeCaption} alt="QR code caption" className="w-full max-w-[190px]" />
+      </div>
     </div>
   );
 }

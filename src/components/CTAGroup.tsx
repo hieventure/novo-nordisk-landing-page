@@ -5,10 +5,10 @@ interface CTAGroupProps {
     saveTheDate: string;
     confirmAttendance: string;
   };
-  rsvpUrl: string;
+  rsvpUrl?: string;
 }
 
-export function CTAGroup({ labels, rsvpUrl }: CTAGroupProps) {
+export function CTAGroup({ labels }: CTAGroupProps) {
   const formatGoogleDate = (isoString: string) => {
     // Returns YYYYMMDDTHHMMSSZ in UTC as required by Google Calendar template
     const d = new Date(isoString);
@@ -134,12 +134,12 @@ export function CTAGroup({ labels, rsvpUrl }: CTAGroupProps) {
     }
   };
 
-  const handleConfirmAttendance = () => {
-    window.open(rsvpUrl, '_blank', 'noopener,noreferrer');
-  };
+  // const handleConfirmAttendance = () => {
+  //   window.open(rsvpUrl, '_blank', 'noopener,noreferrer');
+  // };
 
   return (
-    <div className="flex flex-row justify-center items-center gap-2 sm:gap-6 px-0 sm:px-8 py-8">
+    <div className="flex flex-row justify-center items-center gap-2 sm:gap-6 px-0 md:py-8 py-4">
       {/* Save the Date CTA */}
       <button
         onClick={handleSaveTheDate}
@@ -150,13 +150,13 @@ export function CTAGroup({ labels, rsvpUrl }: CTAGroupProps) {
       </button>
 
       {/* Confirm Attendance CTA */}
-      <button
+      {/* <button
         onClick={handleConfirmAttendance}
         className="group relative bg-cta-gradient text-white font-bold text-xs sm:text-xl lg:text-ozempic-cta px-4 sm:px-8 py-4 sm:px-12 sm:py-5 rounded-full shadow-cta-inner border border-white/40 transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-gradient-red/50 min-w-[120px] sm:min-w-[320px] uppercase w-[50%]"
         aria-label="Confirm attendance for The Power of Less event"
       >
         {labels.confirmAttendance}
-      </button>
+      </button> */}
     </div>
   );
 }

@@ -79,55 +79,121 @@ export function CTAGroup({ labels }: CTAGroupProps) {
       const isAndroid = /Android/.test(ua);
 
       if (isAndroid) {
-        // Android Intent URL - most reliable for triggering browser popup
+        // Method 1: Android Intent URL with forced external browser
         const cleanUrl = currentUrl.replace(/^https?:\/\//, '');
-        const intentUrl = `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end`;
 
+        // Try multiple intent variations
+        const intents = [
+          // Primary intent - forces browser chooser
+          `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(
+            currentUrl
+          )};end`,
+          // Secondary intent with package exclusion
+          `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;launchFlags=0x10000000;end`,
+          // Chrome specific intent
+          `intent://${cleanUrl}#Intent;scheme=https;package=com.android.chrome;end`,
+        ];
+
+        // Try each intent with delay
+        intents.forEach((intentUrl, index) => {
+          setTimeout(() => {
+            try {
+              if (index === 0) {
+                // Primary method: redirect the entire page
+                window.location.replace(intentUrl);
+              } else {
+                // Backup methods
+                window.location.href = intentUrl;
+              }
+            } catch (error) {
+              console.log(`Android intent ${index} failed:`, error);
+
+              // Final fallback for Android: force external browser
+              if (index === intents.length - 1) {
+                // Create invisible iframe with the URL
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                iframe.src = `data:text/html,<script>window.location.href='${currentUrl}';</script>`;
+                document.body.appendChild(iframe);
+
+                setTimeout(() => {
+                  document.body.removeChild(iframe);
+                  // Also try window.open as last resort
+                  window.open(currentUrl, '_blank', 'noreferrer');
+                }, 1000);
+              }
+            }
+          }, index * 500);
+        });
+      } else if (isIOS) {
+        // Method 1: iOS Universal Link approach
         try {
-          window.location.href = intentUrl;
+          // Create a blob URL to force iOS to show "Open in..." menu
+          const htmlContent = `
+            <!DOCTYPE html>
+            <html>
+              <head>
+                <meta http-equiv="refresh" content="0;url=${currentUrl}">
+                <title>Opening in browser...</title>
+              </head>
+              <body>
+                <script>
+                  window.location.href = '${currentUrl}';
+                </script>
+              </body>
+            </html>
+          `;
+
+          const blob = new Blob([htmlContent], { type: 'text/html' });
+          const blobUrl = URL.createObjectURL(blob);
+
+          // Method 1: Use blob URL to trigger external browser
+          const link1 = document.createElement('a');
+          link1.href = blobUrl;
+          link1.download = 'open-in-browser.html';
+          link1.target = '_blank';
+
+          document.body.appendChild(link1);
+          link1.click();
+          document.body.removeChild(link1);
+
+          // Cleanup blob
+          setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
         } catch (error) {
-          console.log('Primary intent failed, trying fallbacks');
-          // Backup: Multiple browser attempts
-          const browsers = [
-            `googlechrome://navigate?url=${encodeURIComponent(currentUrl)}`,
+          console.log('iOS blob method failed:', error);
+        }
+
+        // Method 2: Multiple iOS approaches with delays
+        setTimeout(() => {
+          // Try universal app URL schemes
+          const schemes = [
+            `x-web-search://?${encodeURIComponent(currentUrl)}`,
+            `x-safari-https://${currentUrl.replace(/^https?:\/\//, '')}`,
+            `googlechrome-x-callback://x-callback-url/open/?url=${encodeURIComponent(currentUrl)}`,
             `firefox://open-url?url=${encodeURIComponent(currentUrl)}`,
-            currentUrl,
           ];
 
-          browsers.forEach((url, index) => {
+          schemes.forEach((scheme, index) => {
             setTimeout(() => {
               try {
-                window.open(url, '_blank', 'noopener,noreferrer');
+                window.location.href = scheme;
               } catch (e) {
-                console.log(`Browser fallback ${index} failed`);
+                console.log(`iOS scheme ${index} failed:`, e);
               }
-            }, index * 100);
+            }, index * 300);
           });
-        }
-      } else if (isIOS) {
-        // iOS: Download attribute method - triggers "Open in..." popup
-        const link = document.createElement('a');
-        link.href = currentUrl;
-        link.target = '_blank';
-        link.rel = 'noopener external';
-        link.download = ''; // Key: This triggers iOS "Open in..." popup
+        }, 500);
 
-        // iOS Safari specific attributes
-        link.setAttribute('data-ajax', 'false');
-
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        // Backup method for iOS
+        // Method 3: iOS fallback - replace current location
         setTimeout(() => {
           try {
-            window.open(currentUrl, '_system');
+            // Force navigation away from current domain
+            window.location.replace(currentUrl);
           } catch (error) {
-            console.log('iOS system open failed, trying location method');
-            window.open(currentUrl, '_blank', 'location=yes,noopener,noreferrer');
+            // Ultimate fallback
+            window.open(currentUrl, '_blank', 'location=yes,toolbar=yes');
           }
-        }, 100);
+        }, 2000);
       } else {
         // Desktop fallback
         window.open(currentUrl, '_blank', 'noopener,noreferrer');

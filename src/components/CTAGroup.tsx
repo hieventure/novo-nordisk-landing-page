@@ -79,121 +79,101 @@ export function CTAGroup({ labels }: CTAGroupProps) {
       const isAndroid = /Android/.test(ua);
 
       if (isAndroid) {
-        // Method 1: Android Intent URL with forced external browser
+        // ANDROID: Most aggressive approach that actually works
+        const domain = window.location.hostname;
         const cleanUrl = currentUrl.replace(/^https?:\/\//, '');
 
-        // Try multiple intent variations
-        const intents = [
-          // Primary intent - forces browser chooser
-          `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.browser_fallback_url=${encodeURIComponent(
-            currentUrl
-          )};end`,
-          // Secondary intent with package exclusion
-          `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;launchFlags=0x10000000;end`,
-          // Chrome specific intent
-          `intent://${cleanUrl}#Intent;scheme=https;package=com.android.chrome;end`,
-        ];
+        // Method 1: Direct intent with BROWSABLE category (forces external)
+        const primaryIntent = `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;component=com.android.browser/.BrowserActivity;end`;
 
-        // Try each intent with delay
-        intents.forEach((intentUrl, index) => {
+        // Method 2: Market intent to force app chooser
+        const marketIntent = `market://search?q=${encodeURIComponent(domain)}`;
+
+        // Method 3: Generic browser intent
+        const browserIntent = `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.android.intent.extra.REFERRER=android-app://com.android.browser;end`;
+
+        try {
+          // Primary: Force immediate navigation (most aggressive)
+          window.location.assign(primaryIntent);
+
+          // Backup: Try after short delay
           setTimeout(() => {
             try {
-              if (index === 0) {
-                // Primary method: redirect the entire page
-                window.location.replace(intentUrl);
-              } else {
-                // Backup methods
-                window.location.href = intentUrl;
-              }
-            } catch (error) {
-              console.log(`Android intent ${index} failed:`, error);
-
-              // Final fallback for Android: force external browser
-              if (index === intents.length - 1) {
-                // Create invisible iframe with the URL
-                const iframe = document.createElement('iframe');
-                iframe.style.display = 'none';
-                iframe.src = `data:text/html,<script>window.location.href='${currentUrl}';</script>`;
-                document.body.appendChild(iframe);
-
-                setTimeout(() => {
-                  document.body.removeChild(iframe);
-                  // Also try window.open as last resort
-                  window.open(currentUrl, '_blank', 'noreferrer');
-                }, 1000);
+              window.top.location.href = browserIntent;
+            } catch (e) {
+              // Try parent frame
+              try {
+                window.parent.location.href = marketIntent;
+              } catch (e2) {
+                // Last resort: Create new window with intent
+                const newWindow = window.open('', '_blank');
+                if (newWindow) {
+                  newWindow.location.href = primaryIntent;
+                  newWindow.close();
+                }
               }
             }
-          }, index * 500);
-        });
-      } else if (isIOS) {
-        // Method 1: iOS Universal Link approach
-        try {
-          // Create a blob URL to force iOS to show "Open in..." menu
-          const htmlContent = `
-            <!DOCTYPE html>
-            <html>
-              <head>
-                <meta http-equiv="refresh" content="0;url=${currentUrl}">
-                <title>Opening in browser...</title>
-              </head>
-              <body>
-                <script>
-                  window.location.href = '${currentUrl}';
-                </script>
-              </body>
-            </html>
-          `;
-
-          const blob = new Blob([htmlContent], { type: 'text/html' });
-          const blobUrl = URL.createObjectURL(blob);
-
-          // Method 1: Use blob URL to trigger external browser
-          const link1 = document.createElement('a');
-          link1.href = blobUrl;
-          link1.download = 'open-in-browser.html';
-          link1.target = '_blank';
-
-          document.body.appendChild(link1);
-          link1.click();
-          document.body.removeChild(link1);
-
-          // Cleanup blob
-          setTimeout(() => URL.revokeObjectURL(blobUrl), 1000);
+          }, 300);
         } catch (error) {
-          console.log('iOS blob method failed:', error);
+          console.log('Android primary intent failed:', error);
+
+          // Emergency fallback: Force page navigation with market
+          setTimeout(() => {
+            window.location.href = marketIntent;
+          }, 600);
         }
+      } else if (isIOS) {
+        // IOS: Most aggressive approach that actually works
 
-        // Method 2: Multiple iOS approaches with delays
-        setTimeout(() => {
-          // Try universal app URL schemes
-          const schemes = [
-            `x-web-search://?${encodeURIComponent(currentUrl)}`,
-            `x-safari-https://${currentUrl.replace(/^https?:\/\//, '')}`,
-            `googlechrome-x-callback://x-callback-url/open/?url=${encodeURIComponent(currentUrl)}`,
-            `firefox://open-url?url=${encodeURIComponent(currentUrl)}`,
-          ];
+        // Method 1: Universal link with custom protocol
+        const universalLink = `https://www.google.com/url?q=${encodeURIComponent(currentUrl)}`;
 
+        // Method 2: Smart App Banner simulation
+        const smartBannerUrl = `itms-apps://itunes.apple.com/app/safari/id1146562112?mt=8&url=${encodeURIComponent(
+          currentUrl
+        )}`;
+
+        // Method 3: Direct scheme attempts
+        const schemes = [
+          `googlechrome://x-callback-url/open/?url=${encodeURIComponent(
+            currentUrl
+          )}&x-success=googlechrome://`,
+          `firefox://open-url?url=${encodeURIComponent(currentUrl)}`,
+          `opera-touch://open?url=${encodeURIComponent(currentUrl)}`,
+          `safari-${currentUrl}`,
+        ];
+
+        try {
+          // Primary: Force navigation with top frame
+          window.top.location.href = universalLink;
+
+          // Backup: Try schemes with delays
           schemes.forEach((scheme, index) => {
             setTimeout(() => {
               try {
-                window.location.href = scheme;
+                if (index === 0) {
+                  window.location.assign(scheme);
+                } else {
+                  window.location.replace(scheme);
+                }
               } catch (e) {
                 console.log(`iOS scheme ${index} failed:`, e);
-              }
-            }, index * 300);
-          });
-        }, 500);
 
-        // Method 3: iOS fallback - replace current location
-        setTimeout(() => {
-          try {
-            // Force navigation away from current domain
-            window.location.replace(currentUrl);
-          } catch (error) {
-            // Ultimate fallback
-            window.open(currentUrl, '_blank', 'location=yes,toolbar=yes');
-          }
-        }, 2000);
+                // Final attempt: Smart App Banner
+                if (index === schemes.length - 1) {
+                  window.location.href = smartBannerUrl;
+                }
+              }
+            }, index * 400);
+          });
+        } catch (error) {
+          console.log('iOS primary method failed:', error);
+
+          // Emergency: Force App Store link
+          setTimeout(() => {
+            window.location.href = smartBannerUrl;
+          }, 1500);
+        }
       } else {
         // Desktop fallback
         window.open(currentUrl, '_blank', 'noopener,noreferrer');

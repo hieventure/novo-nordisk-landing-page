@@ -72,122 +72,118 @@ export function CTAGroup({ labels }: CTAGroupProps) {
       }
     };
 
-    const triggerNativeBrowserPopup = () => {
+    const triggerNativeBrowserPopup = async () => {
       const currentUrl = window.location.href;
       const ua = navigator.userAgent;
       const isIOS = /iPad|iPhone|iPod/.test(ua);
       const isAndroid = /Android/.test(ua);
 
-      if (isAndroid) {
-        // ANDROID: Most aggressive approach that actually works
-        const domain = window.location.hostname;
-        const cleanUrl = currentUrl.replace(/^https?:\/\//, '');
-
-        // Method 1: Direct intent with BROWSABLE category (forces external)
-        const primaryIntent = `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;component=com.android.browser/.BrowserActivity;end`;
-
-        // Method 2: Market intent to force app chooser
-        const marketIntent = `market://search?q=${encodeURIComponent(domain)}`;
-
-        // Method 3: Generic browser intent
-        const browserIntent = `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.android.intent.extra.REFERRER=android-app://com.android.browser;end`;
-
+      if (isIOS) {
+        // iOS: Use Web Share API to trigger the EXACT popup in your image
         try {
-          // Primary: Force immediate navigation (most aggressive)
-          window.location.assign(primaryIntent);
-
-          // Backup: Try after short delay
-          setTimeout(() => {
-            try {
-              if (window.top && window.top !== window) {
-                window.top.location.href = browserIntent;
-              } else {
-                throw new Error('No top window available');
-              }
-            } catch (e) {
-              // Try parent frame
-              try {
-                if (window.parent && window.parent !== window) {
-                  window.parent.location.href = marketIntent;
-                } else {
-                  throw new Error('No parent window available');
-                }
-              } catch (e2) {
-                // Last resort: Create new window with intent
-                const newWindow = window.open('', '_blank');
-                if (newWindow) {
-                  newWindow.location.href = primaryIntent;
-                  newWindow.close();
-                }
-              }
-            }
-          }, 300);
+          // Method 1: Web Share API - this triggers the "Open with" popup
+          if (navigator.share) {
+            await navigator.share({
+              title: 'The Power of Less - Ozempic Event',
+              text: 'Join us for an exclusive medical event',
+              url: currentUrl,
+            });
+            return; // Success! The popup appeared
+          }
         } catch (error) {
-          console.log('Android primary intent failed:', error);
-
-          // Emergency fallback: Force page navigation with market
-          setTimeout(() => {
-            window.location.href = marketIntent;
-          }, 600);
+          console.log('Web Share API failed or user cancelled:', error);
+          // User might have cancelled the share dialog - this is normal
+          return;
         }
-      } else if (isIOS) {
-        // IOS: Most aggressive approach that actually works
 
-        // Method 1: Universal link with custom protocol
-        const universalLink = `https://www.google.com/url?q=${encodeURIComponent(currentUrl)}`;
+        // Method 2: Create a data URL to force iOS share
+        try {
+          const mailtoUrl = `mailto:?subject=${encodeURIComponent(
+            'The Power of Less - Ozempic Event'
+          )}&body=${encodeURIComponent('Join us for this exclusive event: ' + currentUrl)}`;
+          window.location.href = mailtoUrl;
+          return;
+        } catch (error) {
+          console.log('Mailto method failed:', error);
+        }
 
-        // Method 2: Smart App Banner simulation
-        const smartBannerUrl = `itms-apps://itunes.apple.com/app/safari/id1146562112?mt=8&url=${encodeURIComponent(
-          currentUrl
-        )}`;
+        // Method 3: Try to create a file that triggers the share sheet
+        try {
+          const eventData = `The Power of Less - Ozempic Event\n${currentUrl}`;
+          const blob = new Blob([eventData], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
 
-        // Method 3: Direct scheme attempts
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'ozempic-event.txt';
+
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
+
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          return;
+        } catch (error) {
+          console.log('File download method failed:', error);
+        }
+
+        // Method 4: Fallback to browser schemes
         const schemes = [
-          `googlechrome://x-callback-url/open/?url=${encodeURIComponent(
-            currentUrl
-          )}&x-success=googlechrome://`,
+          `x-safari-https://${currentUrl.replace(/^https?:\/\//, '')}`,
+          `googlechrome://x-callback-url/open/?url=${encodeURIComponent(currentUrl)}`,
           `firefox://open-url?url=${encodeURIComponent(currentUrl)}`,
-          `opera-touch://open?url=${encodeURIComponent(currentUrl)}`,
-          `safari-${currentUrl}`,
         ];
 
-        try {
-          // Primary: Force navigation with top frame
-          if (window.top && window.top !== window) {
-            window.top.location.href = universalLink;
-          } else {
-            window.location.href = universalLink;
+        for (const scheme of schemes) {
+          try {
+            window.location.href = scheme;
+            break;
+          } catch (error) {
+            console.log(`Scheme failed: ${scheme}`);
           }
-
-          // Backup: Try schemes with delays
-          schemes.forEach((scheme, index) => {
-            setTimeout(() => {
-              try {
-                if (index === 0) {
-                  window.location.assign(scheme);
-                } else {
-                  window.location.replace(scheme);
-                }
-              } catch (e) {
-                console.log(`iOS scheme ${index} failed:`, e);
-
-                // Final attempt: Smart App Banner
-                if (index === schemes.length - 1) {
-                  window.location.href = smartBannerUrl;
-                }
-              }
-            }, index * 400);
-          });
+        }
+      } else if (isAndroid) {
+        // Android: Use Web Share API first, then intent URLs
+        try {
+          // Method 1: Web Share API for Android
+          if (navigator.share) {
+            await navigator.share({
+              title: 'The Power of Less - Ozempic Event',
+              text: 'Join us for an exclusive medical event',
+              url: currentUrl,
+            });
+            return;
+          }
         } catch (error) {
-          console.log('iOS primary method failed:', error);
+          console.log('Android Web Share API failed:', error);
+        }
 
-          // Emergency: Force App Store link
-          setTimeout(() => {
-            window.location.href = smartBannerUrl;
-          }, 1500);
+        // Method 2: Android Intent URLs for browser selection
+        const cleanUrl = currentUrl.replace(/^https?:\/\//, '');
+        const intentUrl = `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end`;
+
+        try {
+          window.location.href = intentUrl;
+        } catch (error) {
+          console.log('Android intent failed:', error);
+
+          // Fallback: Direct browser schemes
+          const androidSchemes = [
+            `googlechrome://navigate?url=${encodeURIComponent(currentUrl)}`,
+            `firefox://open-url?url=${encodeURIComponent(currentUrl)}`,
+          ];
+
+          for (const scheme of androidSchemes) {
+            try {
+              window.location.href = scheme;
+              break;
+            } catch (e) {
+              console.log(`Android scheme failed: ${scheme}`);
+            }
+          }
         }
       } else {
-        // Desktop fallback
+        // Desktop: Standard window.open
         window.open(currentUrl, '_blank', 'noopener,noreferrer');
       }
     };

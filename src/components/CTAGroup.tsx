@@ -38,8 +38,8 @@ export function CTAGroup({ labels }: CTAGroupProps) {
     // Event data used for both flows
     const start = formatGoogleDate(eventData.startDateTime);
     const end = formatGoogleDate(eventData.endDateTime);
-    const title = `${eventData.title} - Ozempic Event`;
-    const details = `${eventData.subtitle}\n\n${eventData.venue.name}\n${eventData.venue.address}`;
+    const title = eventData.title;
+    const details = eventData.subtitle;
     const location = `${eventData.venue.name}, ${eventData.venue.address}`;
 
     const openGoogle = () => {

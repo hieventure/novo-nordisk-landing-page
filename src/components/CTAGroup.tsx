@@ -72,141 +72,116 @@ export function CTAGroup({ labels }: CTAGroupProps) {
       }
     };
 
-    const triggerNativeBrowserPopup = () => {
+    const triggerNativeBrowserPopup = async () => {
       const currentUrl = window.location.href;
       const ua = navigator.userAgent;
       const isIOS = /iPad|iPhone|iPod/.test(ua);
       const isAndroid = /Android/.test(ua);
 
       if (isIOS) {
-        // iOS: Try multiple deep links to escape in-app browser
-        const iosDeepLinks = [
-          // Method 1: Safari web search deep link
-          `x-web-search://?${encodeURIComponent(currentUrl)}`,
-
-          // Method 2: Safari HTTPS scheme
-          `x-safari-https://${currentUrl.replace(/^https?:\/\//, '')}`,
-
-          // Method 3: Safari HTTP scheme
-          `x-safari-http://${currentUrl.replace(/^https?:\/\//, '')}`,
-
-          // Method 4: FBrowser (designed for escaping in-app browsers)
-          `fbrowser://open?url=${encodeURIComponent(currentUrl)}`,
-
-          // Method 5: Opener app deep link
-          `opener://open?url=${encodeURIComponent(currentUrl)}`,
-
-          // Method 6: iOS Shortcuts
-          `shortcuts://run-shortcut?name=Open%20in%20Safari&input=${encodeURIComponent(
-            currentUrl
-          )}`,
-
-          // Method 7: Chrome iOS
-          `googlechrome://x-callback-url/open/?url=${encodeURIComponent(
-            currentUrl
-          )}&x-success=googlechrome://`,
-
-          // Method 8: Firefox iOS
-          `firefox://open-url?url=${encodeURIComponent(currentUrl)}`,
-
-          // Method 9: Edge iOS
-          `microsoft-edge-https://${currentUrl.replace(/^https?:\/\//, '')}`,
-
-          // Method 10: Opera iOS
-          `opera-https://${currentUrl.replace(/^https?:\/\//, '')}`,
-        ];
-
-        console.log('🚀 Trying iOS deep links to escape in-app browser...');
-
-        // Try each deep link with delay
-        iosDeepLinks.forEach((deepLink, index) => {
-          setTimeout(() => {
-            try {
-              console.log(`📱 Trying iOS method ${index + 1}: ${deepLink.split('://')[0]}`);
-              window.location.href = deepLink;
-            } catch (error) {
-              console.log(`❌ iOS method ${index + 1} failed:`, error);
-            }
-          }, index * 300); // 300ms delay between attempts
-        });
-
-        // Add Smart App Banner for Safari (Method 11)
+        // iOS: Use Web Share API to trigger the EXACT popup in your image
         try {
-          const existingBanner = document.querySelector('meta[name="apple-itunes-app"]');
-          if (!existingBanner) {
-            const smartBanner = document.createElement('meta');
-            smartBanner.name = 'apple-itunes-app';
-            smartBanner.content = `app-id=1146562112, app-argument=${encodeURIComponent(
-              currentUrl
-            )}`;
-            document.head.appendChild(smartBanner);
-            console.log('📱 Added Smart App Banner for Safari');
+          // Method 1: Web Share API - this triggers the "Open with" popup
+          if (navigator.share) {
+            await navigator.share({
+              title: 'The Power of Less - Ozempic Event',
+              text: 'Join us for an exclusive medical event',
+              url: currentUrl,
+            });
+            return; // Success! The popup appeared
           }
         } catch (error) {
-          console.log('❌ Smart App Banner failed:', error);
+          console.log('Web Share API failed or user cancelled:', error);
+          // User might have cancelled the share dialog - this is normal
+          return;
         }
 
-        // Fallback: Copy to clipboard and show instructions (Method 12)
-        setTimeout(() => {
-          try {
-            if (navigator.clipboard) {
-              navigator.clipboard.writeText(currentUrl).then(() => {
-                alert(
-                  `🔗 Link copied to clipboard!\n\nTo open in Safari:\n1. Open Safari app\n2. Paste the link in address bar\n3. Press Go\n\nOr try long-pressing any link on this page and select "Open in Safari"`
-                );
-              });
-            } else {
-              alert(
-                `🔗 To open in Safari:\n\nCopy this link: ${currentUrl}\n\n1. Open Safari app\n2. Paste the link\n3. Press Go\n\nOr try long-pressing any link and select "Open in Safari"`
-              );
-            }
-          } catch (error) {
-            console.log('❌ Clipboard fallback failed:', error);
-          }
-        }, 3000); // Show after all deep links are tried
-      } else if (isAndroid) {
-        // Android: Intent URLs and browser deep links
-        const cleanUrl = currentUrl.replace(/^https?:\/\//, '');
+        // Method 2: Create a data URL to force iOS share
+        try {
+          const mailtoUrl = `mailto:?subject=${encodeURIComponent(
+            'The Power of Less - Ozempic Event'
+          )}&body=${encodeURIComponent('Join us for this exclusive event: ' + currentUrl)}`;
+          window.location.href = mailtoUrl;
+          return;
+        } catch (error) {
+          console.log('Mailto method failed:', error);
+        }
 
-        const androidMethods = [
-          // Method 1: Intent with explicit chooser
-          `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;S.android.intent.extra.chooser_title=Choose%20Browser;end`,
+        // Method 3: Try to create a file that triggers the share sheet
+        try {
+          const eventData = `The Power of Less - Ozempic Event\n${currentUrl}`;
+          const blob = new Blob([eventData], { type: 'text/plain' });
+          const url = URL.createObjectURL(blob);
 
-          // Method 2: Standard browser intent
-          `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end`,
+          const link = document.createElement('a');
+          link.href = url;
+          link.download = 'ozempic-event.txt';
 
-          // Method 3: Chrome Android
-          `googlechrome://navigate?url=${encodeURIComponent(currentUrl)}`,
+          document.body.appendChild(link);
+          link.click();
+          document.body.removeChild(link);
 
-          // Method 4: Firefox Android
+          setTimeout(() => URL.revokeObjectURL(url), 1000);
+          return;
+        } catch (error) {
+          console.log('File download method failed:', error);
+        }
+
+        // Method 4: Fallback to browser schemes
+        const schemes = [
+          `x-safari-https://${currentUrl.replace(/^https?:\/\//, '')}`,
+          `googlechrome://x-callback-url/open/?url=${encodeURIComponent(currentUrl)}`,
           `firefox://open-url?url=${encodeURIComponent(currentUrl)}`,
-
-          // Method 5: Opera Android
-          `opera://command/goto?url=${encodeURIComponent(currentUrl)}`,
-
-          // Method 6: Samsung Internet
-          `samsungbrowser://open?url=${encodeURIComponent(currentUrl)}`,
-
-          // Method 7: Edge Android
-          `microsoft-edge://open?url=${encodeURIComponent(currentUrl)}`,
         ];
 
-        console.log('🚀 Trying Android methods to open in external browser...');
+        for (const scheme of schemes) {
+          try {
+            window.location.href = scheme;
+            break;
+          } catch (error) {
+            console.log(`Scheme failed: ${scheme}`);
+          }
+        }
+      } else if (isAndroid) {
+        // Android: Use Web Share API first, then intent URLs
+        try {
+          // Method 1: Web Share API for Android
+          if (navigator.share) {
+            await navigator.share({
+              title: 'The Power of Less - Ozempic Event',
+              text: 'Join us for an exclusive medical event',
+              url: currentUrl,
+            });
+            return;
+          }
+        } catch (error) {
+          console.log('Android Web Share API failed:', error);
+        }
 
-        androidMethods.forEach((method, index) => {
-          setTimeout(() => {
+        // Method 2: Android Intent URLs for browser selection
+        const cleanUrl = currentUrl.replace(/^https?:\/\//, '');
+        const intentUrl = `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end`;
+
+        try {
+          window.location.href = intentUrl;
+        } catch (error) {
+          console.log('Android intent failed:', error);
+
+          // Fallback: Direct browser schemes
+          const androidSchemes = [
+            `googlechrome://navigate?url=${encodeURIComponent(currentUrl)}`,
+            `firefox://open-url?url=${encodeURIComponent(currentUrl)}`,
+          ];
+
+          for (const scheme of androidSchemes) {
             try {
-              console.log(`🤖 Trying Android method ${index + 1}`);
-              if (index === 0) {
-                window.location.assign(method);
-              } else {
-                window.location.href = method;
-              }
-            } catch (error) {
-              console.log(`❌ Android method ${index + 1} failed:`, error);
+              window.location.href = scheme;
+              break;
+            } catch (e) {
+              console.log(`Android scheme failed: ${scheme}`);
             }
-          }, index * 400);
-        });
+          }
+        }
       } else {
         // Desktop: Standard window.open
         window.open(currentUrl, '_blank', 'noopener,noreferrer');

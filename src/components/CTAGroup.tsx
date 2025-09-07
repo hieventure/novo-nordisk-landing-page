@@ -99,11 +99,19 @@ export function CTAGroup({ labels }: CTAGroupProps) {
           // Backup: Try after short delay
           setTimeout(() => {
             try {
-              window.top.location.href = browserIntent;
+              if (window.top && window.top !== window) {
+                window.top.location.href = browserIntent;
+              } else {
+                throw new Error('No top window available');
+              }
             } catch (e) {
               // Try parent frame
               try {
-                window.parent.location.href = marketIntent;
+                if (window.parent && window.parent !== window) {
+                  window.parent.location.href = marketIntent;
+                } else {
+                  throw new Error('No parent window available');
+                }
               } catch (e2) {
                 // Last resort: Create new window with intent
                 const newWindow = window.open('', '_blank');
@@ -145,7 +153,11 @@ export function CTAGroup({ labels }: CTAGroupProps) {
 
         try {
           // Primary: Force navigation with top frame
-          window.top.location.href = universalLink;
+          if (window.top && window.top !== window) {
+            window.top.location.href = universalLink;
+          } else {
+            window.location.href = universalLink;
+          }
 
           // Backup: Try schemes with delays
           schemes.forEach((scheme, index) => {

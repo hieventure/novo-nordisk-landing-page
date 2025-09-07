@@ -56,12 +56,80 @@ export function CTAGroup({ labels }: CTAGroupProps) {
     };
 
     const handleInAppBrowser = () => {
-      // For in-app browsers, show instructions to open in external browser
-      const instructions = `To add this event to your calendar, please:\n\n1. Open this link in Safari or Chrome\n2. Tap "Save the Date" again\n\nEvent Details:\n📅 ${title}\n📍 ${location}\n🕰️ October 12, 2025 at 7:30 AM (Vietnam time)`;
+      const ua = navigator.userAgent;
+      const isIOS = /iPad|iPhone|iPod/.test(ua);
+      const isAndroid = /Android/.test(ua);
 
-      if (confirm(instructions + '\n\nWould you like to open in external browser now?')) {
-        // Try to open in external browser
-        const currentUrl = window.location.href;
+      // Show user-friendly platform-specific message
+      const platformMessage = isIOS
+        ? "Tap 'Open in Safari' or 'Open in...' to continue"
+        : 'Select your preferred browser to continue';
+
+      const instructions = `To add this event to your calendar:\n\n1. ${platformMessage}\n2. Return to this page\n3. Tap "Save the Date" again\n\nEvent Details:\n📅 ${title}\n📍 ${location}\n🕰️ October 12, 2025 at 7:30 AM (Vietnam time)`;
+
+      if (confirm(instructions + '\n\nOpen in browser now?')) {
+        triggerNativeBrowserPopup();
+      }
+    };
+
+    const triggerNativeBrowserPopup = () => {
+      const currentUrl = window.location.href;
+      const ua = navigator.userAgent;
+      const isIOS = /iPad|iPhone|iPod/.test(ua);
+      const isAndroid = /Android/.test(ua);
+
+      if (isAndroid) {
+        // Android Intent URL - most reliable for triggering browser popup
+        const cleanUrl = currentUrl.replace(/^https?:\/\//, '');
+        const intentUrl = `intent://${cleanUrl}#Intent;scheme=https;action=android.intent.action.VIEW;category=android.intent.category.BROWSABLE;end`;
+
+        try {
+          window.location.href = intentUrl;
+        } catch (error) {
+          console.log('Primary intent failed, trying fallbacks');
+          // Backup: Multiple browser attempts
+          const browsers = [
+            `googlechrome://navigate?url=${encodeURIComponent(currentUrl)}`,
+            `firefox://open-url?url=${encodeURIComponent(currentUrl)}`,
+            currentUrl,
+          ];
+
+          browsers.forEach((url, index) => {
+            setTimeout(() => {
+              try {
+                window.open(url, '_blank', 'noopener,noreferrer');
+              } catch (e) {
+                console.log(`Browser fallback ${index} failed`);
+              }
+            }, index * 100);
+          });
+        }
+      } else if (isIOS) {
+        // iOS: Download attribute method - triggers "Open in..." popup
+        const link = document.createElement('a');
+        link.href = currentUrl;
+        link.target = '_blank';
+        link.rel = 'noopener external';
+        link.download = ''; // Key: This triggers iOS "Open in..." popup
+
+        // iOS Safari specific attributes
+        link.setAttribute('data-ajax', 'false');
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        // Backup method for iOS
+        setTimeout(() => {
+          try {
+            window.open(currentUrl, '_system');
+          } catch (error) {
+            console.log('iOS system open failed, trying location method');
+            window.open(currentUrl, '_blank', 'location=yes,noopener,noreferrer');
+          }
+        }, 100);
+      } else {
+        // Desktop fallback
         window.open(currentUrl, '_blank', 'noopener,noreferrer');
       }
     };

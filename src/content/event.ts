@@ -1,16 +1,16 @@
 export const eventData = {
-  title: 'THE POWER OF LESS',
-  subtitle: 'Một tuần 1 lần - bảo vệ đa cơ quan',
+  title: 'Sự kiện: OZEMPIC® chính thức ra mắt tại Việt Nam',
+  subtitle: '1 lần/tuần - Kiểm soát đa mục tiêu',
 
   // Event timing
   startDateTime: '2025-10-12T07:30:00+07:00', // Asia/Ho_Chi_Minh timezone
-  endDateTime: '2025-10-12T09:30:00+07:00',
+  endDateTime: '2025-10-12T12:00:00+07:00',
   timezone: 'Asia/Ho_Chi_Minh',
 
   // Venue
   venue: {
     name: 'Thiskyhall Sala',
-    address: 'Tầng 5 - 10 Đ. Mai Chí Thọ, Phường An Khánh, Thủ Đức, Hồ Chí Minh',
+    address: 'Tầng 5, Số 10 Đ. Mai Chí Thọ, Phường An Khánh, Thủ Đức, Hồ Chí Minh',
     googleMapsUrl: 'https://maps.google.com/?q=Thiskyhall+Sala+Mai+Chi+Tho+Thu+Duc+Ho+Chi+Minh',
   },
 

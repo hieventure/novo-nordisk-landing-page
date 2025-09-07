@@ -58,7 +58,7 @@ export function CTAGroup({ labels }: CTAGroupProps) {
     const handleInAppBrowser = () => {
       const ua = navigator.userAgent;
       const isIOS = /iPad|iPhone|iPod/.test(ua);
-      const isAndroid = /Android/.test(ua);
+      // const isAndroid = /Android/.test(ua);
 
       // Show user-friendly platform-specific message
       const platformMessage = isIOS

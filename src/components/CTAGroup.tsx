@@ -1,14 +1,7 @@
 import { downloadICS, generateICS } from '@/lib/ics';
 import { eventData } from '@/content/event';
-interface CTAGroupProps {
-  labels: {
-    saveTheDate: string;
-    confirmAttendance: string;
-  };
-  rsvpUrl?: string;
-}
 
-export function CTAGroup({ labels }: CTAGroupProps) {
+export function CTAGroup() {
   const formatGoogleDate = (isoString: string) => {
     // Returns YYYYMMDDTHHMMSSZ in UTC as required by Google Calendar template
     const d = new Date(isoString);

@@ -134,7 +134,7 @@ export function Landing() {
 
         {/* CTAs */}
         <section>
-          <CTAGroup labels={eventData.labels} rsvpUrl={eventData.rsvpUrl} />
+          <CTAGroup />
         </section>
 
         {/* Disclaimer */}

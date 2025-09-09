@@ -6,9 +6,11 @@ import { LanguageToggle } from '@/components/LanguageToggle';
 import { eventData } from '@/content/event';
 import backgroundDesktop from '@/assets/bg-desktop.png';
 import { Countdown } from '@/components/Countdown';
-import kvBannerVi from '@/assets/kv-banner-vi.png';
-import kvBannerEn from '@/assets/kv-banner-en.png';
-// import isMobile from 'is-mobile';
+import kvBannerViDesktop from '@/assets/kv-banner-vi-desktop.png';
+import kvBannerViMobile from '@/assets/kv-banner-vi-mobile.png';
+import kvBannerEnDesktop from '@/assets/kv-banner-en-desktop.png';
+import kvBannerEnMobile from '@/assets/kv-banner-en-mobile.png';
+import isMobile from 'is-mobile';
 import eventInfoVi from '@/assets/event-info-vi.png';
 import eventInfoEn from '@/assets/event-info-en.png';
 import footerVi from '@/assets/footer-vi.png';
@@ -40,7 +42,7 @@ import { useState } from 'react';
 // };
 
 export function Landing() {
-  // const isMobileView = isMobile();
+  const isMobileView = isMobile();
 
   const [language, setLanguage] = useState('vi');
 
@@ -59,7 +61,15 @@ export function Landing() {
     >
       <div className="relative">
         <img
-          src={language === 'vi' ? kvBannerVi : kvBannerEn}
+          src={
+            language === 'vi'
+              ? isMobileView
+                ? kvBannerViMobile
+                : kvBannerViDesktop
+              : isMobileView
+              ? kvBannerEnMobile
+              : kvBannerEnDesktop
+          }
           alt="KV Banner"
           className="w-full h-auto"
         />

@@ -10,41 +10,27 @@ import kvBannerViDesktop from '@/assets/kv-banner-vi-desktop.png';
 import kvBannerViMobile from '@/assets/kv-banner-vi-mobile.png';
 import kvBannerEnDesktop from '@/assets/kv-banner-en-desktop.png';
 import kvBannerEnMobile from '@/assets/kv-banner-en-mobile.png';
+import kvVideoVi from '@/assets/kv-video-vi.mp4';
 import isMobile from 'is-mobile';
 import eventInfoVi from '@/assets/event-info-vi.png';
 import eventInfoEn from '@/assets/event-info-en.png';
 import footerVi from '@/assets/footer-vi.png';
 import footerEn from '@/assets/footer-en.png';
 
-import { useState } from 'react';
-
-// interface LanguageToggleProps {
-//   onLanguageChange: (language: string) => void;
-// }
-
-// const LANGUAGES = {
-//   vi: {
-//     countdown: {
-//       days: 'NGÀY',
-//       hours: 'GIỜ',
-//       minutes: 'PHÚT',
-//       seconds: 'GIÂY',
-//     },
-//   },
-//   en: {
-//     countdown: {
-//       days: 'DAYS',
-//       hours: 'HOURS',
-//       minutes: 'MINUTES',
-//       seconds: 'SECONDS',
-//     },
-//   },
-// };
+import { useState, useEffect } from 'react';
 
 export function Landing() {
   const isMobileView = isMobile();
 
   const [language, setLanguage] = useState('vi');
+  const [useVideo, setUseVideo] = useState(false);
+
+  // Check for query parameter on component mount
+  useEffect(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const tesVideo = urlParams.get('testVideo');
+    setUseVideo(tesVideo === 'true');
+  }, []);
 
   const handleLanguageChange = (language: string) => {
     setLanguage(language);
@@ -59,20 +45,51 @@ export function Landing() {
         backgroundPosition: 'top',
       }}
     >
-      <div className="relative">
-        <img
-          src={
-            language === 'vi'
-              ? isMobileView
-                ? kvBannerViMobile
-                : kvBannerViDesktop
-              : isMobileView
-              ? kvBannerEnMobile
-              : kvBannerEnDesktop
-          }
-          alt="KV Banner"
-          className="w-full h-auto"
-        />
+      <div className="relative w-screen h-screen overflow-hidden flex items-center justify-center">
+        {/* Conditional rendering based on useVideo flag */}
+        {useVideo ? (
+          /* Video Banner - Only show for Vietnamese language when useVideo=true */
+          language === 'vi' ? (
+            <video
+              className="w-full h-full object-fill"
+              autoPlay
+              loop
+              muted
+              playsInline
+              preload="metadata"
+            >
+              <source src={kvVideoVi} type="video/mp4" />
+              {/* Fallback image for browsers that don't support video */}
+              <img
+                src={isMobileView ? kvBannerViMobile : kvBannerViDesktop}
+                alt="KV Banner"
+                className="w-full h-full object-contain"
+              />
+            </video>
+          ) : (
+            <img
+              src={isMobileView ? kvBannerEnMobile : kvBannerEnDesktop}
+              alt="KV Banner"
+              className="w-full h-full object-contain"
+            />
+          )
+        ) : (
+          /* Original Image Banner - Default behavior */
+          <img
+            src={
+              language === 'vi'
+                ? isMobileView
+                  ? kvBannerViMobile
+                  : kvBannerViDesktop
+                : isMobileView
+                ? kvBannerEnMobile
+                : kvBannerEnDesktop
+            }
+            alt="KV Banner"
+            className="w-full h-auto"
+          />
+        )}
+
         {/* Language Toggle */}
         <div className="absolute top-2 right-2 sm:top-2 sm:right-4 z-10">
           <LanguageToggle
@@ -86,7 +103,7 @@ export function Landing() {
       </div>
 
       {/* Content Container - Max width only for very large screens (2xl+) */}
-      <div className="2xl:max-w-[1200px] 2xl:mx-auto px-4">
+      <div className={`2xl:max-w-[1200px] 2xl:mx-auto px-4 ${useVideo ? 'mt-[60px]' : ''}`}>
         <section>
           <Countdown
             targetDate={eventData.startDateTime}

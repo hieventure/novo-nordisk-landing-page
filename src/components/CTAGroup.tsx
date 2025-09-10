@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { downloadICS, generateICS } from '@/lib/ics';
 import { eventData } from '@/content/event';
 
@@ -77,8 +78,8 @@ export function CTAGroup() {
           // Method 1: Web Share API - this triggers the "Open with" popup
           if (navigator.share) {
             await navigator.share({
-              title: 'The Power of Less - Ozempic Event',
-              text: 'Join us for an exclusive medical event',
+              title: eventData.title,
+              text: eventData.subtitle,
               url: currentUrl,
             });
             return; // Success! The popup appeared
@@ -92,7 +93,7 @@ export function CTAGroup() {
         // Method 2: Create a data URL to force iOS share
         try {
           const mailtoUrl = `mailto:?subject=${encodeURIComponent(
-            'The Power of Less - Ozempic Event'
+            eventData.title
           )}&body=${encodeURIComponent('Join us for this exclusive event: ' + currentUrl)}`;
           window.location.href = mailtoUrl;
           return;
@@ -102,13 +103,13 @@ export function CTAGroup() {
 
         // Method 3: Try to create a file that triggers the share sheet
         try {
-          const eventData = `The Power of Less - Ozempic Event\n${currentUrl}`;
-          const blob = new Blob([eventData], { type: 'text/plain' });
+          const eventInfo = `${eventData.title}\n${currentUrl}`;
+          const blob = new Blob([eventInfo], { type: 'text/plain' });
           const url = URL.createObjectURL(blob);
 
           const link = document.createElement('a');
           link.href = url;
-          link.download = 'ozempic-event.txt';
+          link.download = `${eventData.title}.txt`;
 
           document.body.appendChild(link);
           link.click();
@@ -141,13 +142,13 @@ export function CTAGroup() {
           // Method 1: Web Share API for Android
           if (navigator.share) {
             await navigator.share({
-              title: 'The Power of Less - Ozempic Event',
-              text: 'Join us for an exclusive medical event',
+              title: eventData.title,
+              text: eventData.subtitle,
               url: currentUrl,
             });
             return;
           }
-        } catch (error) {
+        } catch (error: any) {
           console.log('Android Web Share API failed:', error);
         }
 
@@ -170,7 +171,7 @@ export function CTAGroup() {
             try {
               window.location.href = scheme;
               break;
-            } catch (e) {
+            } catch (e: any) {
               console.log(`Android scheme failed: ${scheme}`);
             }
           }
@@ -201,7 +202,7 @@ export function CTAGroup() {
           // Create a temporary link element
           const link = document.createElement('a');
           link.href = url;
-          link.download = 'ozempic-event.ics';
+          link.download = `${eventData.title}.ics`;
           link.target = '_blank';
           link.rel = 'noopener';
 
@@ -212,7 +213,7 @@ export function CTAGroup() {
 
           // Clean up
           setTimeout(() => URL.revokeObjectURL(url), 1000);
-        } catch (error) {
+        } catch (error: any) {
           console.log('iOS calendar method failed, trying Google Calendar fallback');
           // Fallback to Google Calendar
           const opened = openGoogle();
@@ -226,7 +227,7 @@ export function CTAGroup() {
           }
         }
       } else {
-        downloadICS(event, 'ozempic-the-power-of-less.ics');
+        downloadICS(event, `${eventData.title}.ics`);
       }
     };
 
@@ -270,7 +271,7 @@ export function CTAGroup() {
         className="group relative bg-cta-gradient text-white font-bold text-xs sm:text-xl lg:text-ozempic-cta px-4 sm:px-8 py-4 sm:px-12 sm:py-5 rounded-full shadow-cta-inner border border-white/40 transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-gradient-red/50 min-w-[120px] sm:min-w-[320px] uppercase w-[50%]"
         aria-label="Confirm attendance for The Power of Less event"
       >
-        {labels.confirmAttendance}
+        CONFIRM ATTENDANCE
       </button> */}
     </div>
   );

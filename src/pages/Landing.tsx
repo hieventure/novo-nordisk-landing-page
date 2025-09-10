@@ -11,6 +11,8 @@ import kvBannerViMobile from '@/assets/kv-banner-vi-mobile.png';
 import kvBannerEnDesktop from '@/assets/kv-banner-en-desktop.png';
 import kvBannerEnMobile from '@/assets/kv-banner-en-mobile.png';
 import kvVideoVi from '@/assets/kv-video-vi.mp4';
+import kvVideoViV2 from '@/assets/kv-video-vi-v2.mp4';
+import kvVideoViMobile from '@/assets/kv-video-vi-mobile.mp4';
 import isMobile from 'is-mobile';
 import eventInfoVi from '@/assets/event-info-vi.png';
 import eventInfoEn from '@/assets/event-info-en.png';
@@ -23,13 +25,20 @@ export function Landing() {
   const isMobileView = isMobile();
 
   const [language, setLanguage] = useState('vi');
-  const [useVideo, setUseVideo] = useState(false);
+  const [videoVersion, setVideoVersion] = useState(0); // 0 = no video, 1 = version 1, 2 = version 2
 
   // Check for query parameter on component mount
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
-    const tesVideo = urlParams.get('testVideo');
-    setUseVideo(tesVideo === 'true');
+    const testVideo = urlParams.get('testVideo');
+
+    if (testVideo === '1') {
+      setVideoVersion(1);
+    } else if (testVideo === '2') {
+      setVideoVersion(2);
+    } else {
+      setVideoVersion(0);
+    }
   }, []);
 
   const handleLanguageChange = (language: string) => {
@@ -45,10 +54,16 @@ export function Landing() {
         backgroundPosition: 'top',
       }}
     >
-      <div className="relative w-screen h-screen overflow-hidden flex items-center justify-center">
-        {/* Conditional rendering based on useVideo flag */}
-        {useVideo ? (
-          /* Video Banner - Only show for Vietnamese language when useVideo=true */
+      <div
+        className={`relative ${
+          videoVersion > 0
+            ? 'w-screen h-screen overflow-hidden flex items-center justify-center'
+            : ''
+        } `}
+      >
+        {/* Conditional rendering based on videoVersion */}
+        {videoVersion > 0 ? (
+          /* Video Banner - Only show for Vietnamese language when videoVersion > 0 */
           language === 'vi' ? (
             <video
               className="w-full h-full object-fill"
@@ -58,7 +73,10 @@ export function Landing() {
               playsInline
               preload="metadata"
             >
-              <source src={kvVideoVi} type="video/mp4" />
+              <source
+                src={isMobileView ? kvVideoViMobile : videoVersion === 1 ? kvVideoVi : kvVideoViV2}
+                type="video/mp4"
+              />
               {/* Fallback image for browsers that don't support video */}
               <img
                 src={isMobileView ? kvBannerViMobile : kvBannerViDesktop}
@@ -103,7 +121,7 @@ export function Landing() {
       </div>
 
       {/* Content Container - Max width only for very large screens (2xl+) */}
-      <div className={`2xl:max-w-[1200px] 2xl:mx-auto px-4 ${useVideo ? 'mt-[60px]' : ''}`}>
+      <div className={`2xl:max-w-[1200px] 2xl:mx-auto px-4 ${videoVersion > 0 ? 'mt-[60px]' : ''}`}>
         <section>
           <Countdown
             targetDate={eventData.startDateTime}

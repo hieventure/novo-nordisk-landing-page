@@ -12,7 +12,6 @@ import kvBannerEnDesktop from '@/assets/kv-banner-en-desktop.png';
 import kvBannerEnMobile from '@/assets/kv-banner-en-mobile.png';
 import kvVideoViDesktop from '@/assets/kv-video-vi-desktop.mp4';
 import kvVideoEnDesktop from '@/assets/kv-video-en-desktop.mp4';
-import kvVideoViV2 from '@/assets/kv-video-vi-v2.mp4';
 import kvVideoViMobile from '@/assets/kv-video-vi-mobile.mp4';
 import kvVideoEnMobile from '@/assets/kv-video-en-mobile.mp4';
 import isMobile from 'is-mobile';

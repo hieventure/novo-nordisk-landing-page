@@ -10,9 +10,11 @@ import kvBannerViDesktop from '@/assets/kv-banner-vi-desktop.png';
 import kvBannerViMobile from '@/assets/kv-banner-vi-mobile.png';
 import kvBannerEnDesktop from '@/assets/kv-banner-en-desktop.png';
 import kvBannerEnMobile from '@/assets/kv-banner-en-mobile.png';
-import kvVideoVi from '@/assets/kv-video-vi.mp4';
+import kvVideoViDesktop from '@/assets/kv-video-vi-desktop.mp4';
+import kvVideoEnDesktop from '@/assets/kv-video-en-desktop.mp4';
 import kvVideoViV2 from '@/assets/kv-video-vi-v2.mp4';
 import kvVideoViMobile from '@/assets/kv-video-vi-mobile.mp4';
+import kvVideoEnMobile from '@/assets/kv-video-en-mobile.mp4';
 import isMobile from 'is-mobile';
 import eventInfoVi from '@/assets/event-info-vi.png';
 import eventInfoEn from '@/assets/event-info-en.png';
@@ -45,6 +47,13 @@ export function Landing() {
     setLanguage(language);
   };
 
+  const getVideoSource = () => {
+    if (isMobileView) {
+      return language === 'vi' ? kvVideoViMobile : kvVideoEnMobile;
+    }
+    return language === 'vi' ? kvVideoViDesktop : kvVideoEnDesktop;
+  };
+
   return (
     <div
       className="min-h-screen bg-center bg-no-repeat"
@@ -64,33 +73,22 @@ export function Landing() {
         {/* Conditional rendering based on videoVersion */}
         {videoVersion > 0 ? (
           /* Video Banner - Only show for Vietnamese language when videoVersion > 0 */
-          language === 'vi' ? (
-            <video
-              className="w-full h-full object-fill"
-              autoPlay
-              loop
-              muted
-              playsInline
-              preload="metadata"
-            >
-              <source
-                src={isMobileView ? kvVideoViMobile : videoVersion === 1 ? kvVideoVi : kvVideoViV2}
-                type="video/mp4"
-              />
-              {/* Fallback image for browsers that don't support video */}
-              <img
-                src={isMobileView ? kvBannerViMobile : kvBannerViDesktop}
-                alt="KV Banner"
-                className="w-full h-full object-contain"
-              />
-            </video>
-          ) : (
+          <video
+            className="w-full h-full object-fill"
+            autoPlay
+            loop
+            muted
+            playsInline
+            preload="metadata"
+          >
+            <source src={getVideoSource()} type="video/mp4" />
+            {/* Fallback image for browsers that don't support video */}
             <img
-              src={isMobileView ? kvBannerEnMobile : kvBannerEnDesktop}
+              src={isMobileView ? kvBannerViMobile : kvBannerViDesktop}
               alt="KV Banner"
               className="w-full h-full object-contain"
             />
-          )
+          </video>
         ) : (
           /* Original Image Banner - Default behavior */
           <img

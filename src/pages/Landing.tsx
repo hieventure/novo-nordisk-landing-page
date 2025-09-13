@@ -26,20 +26,16 @@ export function Landing() {
   const isMobileView = isMobile();
 
   const [language, setLanguage] = useState('vi');
-  const [videoVersion, setVideoVersion] = useState(0); // 0 = no video, 1 = version 1, 2 = version 2
+  const [useTestVideo, setUseTestVideo] = useState(false);
 
   // Check for query parameter on component mount
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const testVideo = urlParams.get('testVideo');
 
-    if (testVideo === '1') {
-      setVideoVersion(1);
-    } else if (testVideo === '2') {
-      setVideoVersion(2);
-    } else {
-      setVideoVersion(0);
-    }
+    if (testVideo === 'true') {
+      setUseTestVideo(true);
+    } 
   }, []);
 
   const handleLanguageChange = (language: string) => {
@@ -64,15 +60,16 @@ export function Landing() {
     >
       <div
         className={`relative ${
-          videoVersion > 0
+          useTestVideo
             ? 'w-screen h-screen overflow-hidden flex items-center justify-center'
             : ''
         } `}
       >
         {/* Conditional rendering based on videoVersion */}
-        {videoVersion > 0 ? (
+        {useTestVideo ? (
           /* Video Banner - Only show for Vietnamese language when videoVersion > 0 */
           <video
+            key={`${language}-${isMobileView ? 'mobile' : 'desktop'}`}
             className="w-full h-full object-fill"
             autoPlay
             loop
@@ -83,7 +80,10 @@ export function Landing() {
             <source src={getVideoSource()} type="video/mp4" />
             {/* Fallback image for browsers that don't support video */}
             <img
-              src={isMobileView ? kvBannerViMobile : kvBannerViDesktop}
+              src={language === 'vi' 
+                ? (isMobileView ? kvBannerViMobile : kvBannerViDesktop)
+                : (isMobileView ? kvBannerEnMobile : kvBannerEnDesktop)
+              }
               alt="KV Banner"
               className="w-full h-full object-contain"
             />
@@ -118,7 +118,7 @@ export function Landing() {
       </div>
 
       {/* Content Container - Max width only for very large screens (2xl+) */}
-      <div className={`2xl:max-w-[1200px] 2xl:mx-auto px-4 ${videoVersion > 0 ? 'mt-[60px]' : ''}`}>
+      <div className={`2xl:max-w-[1200px] 2xl:mx-auto px-4 ${useTestVideo ? 'mt-[60px]' : ''}`}>
         <section>
           <Countdown
             targetDate={eventData.startDateTime}

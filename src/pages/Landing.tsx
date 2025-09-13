@@ -20,16 +20,13 @@ import eventInfoEn from '@/assets/event-info-en.png';
 import footerVi from '@/assets/footer-vi.png';
 import footerEn from '@/assets/footer-en.png';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 
 export function Landing() {
   const isMobileView = isMobile();
-  const videoRef = useRef<HTMLVideoElement>(null);
 
   const [language, setLanguage] = useState('vi');
   const [useTestVideo, setUseTestVideo] = useState(false);
-  const [isInAppBrowser, setIsInAppBrowser] = useState(false);
-  const [videoError, setVideoError] = useState(false);
 
   // Check for query parameter on component mount
   useEffect(() => {
@@ -40,68 +37,6 @@ export function Landing() {
       setUseTestVideo(true);
     } 
   }, []);
-
-  // Detect in-app browser
-  useEffect(() => {
-    const detectInAppBrowser = () => {
-      const userAgent = navigator.userAgent || navigator.vendor || (window as unknown as { opera?: string }).opera || '';
-      
-      // Common in-app browser patterns
-      const inAppPatterns = [
-        /FBAN|FBAV/i, // Facebook
-        /Instagram/i, // Instagram
-        /Line/i, // LINE
-        /MicroMessenger/i, // WeChat
-        /QQ/i, // QQ
-        /MQQBrowser/i, // QQ Browser
-        /UCBrowser/i, // UC Browser
-        /baiduboxapp/i, // Baidu
-        /baidubrowser/i, // Baidu Browser
-        /MiuiBrowser/i, // MIUI Browser
-        /SamsungBrowser/i, // Samsung Browser
-        /wv/i, // WebView
-        /Version.*Chrome.*Mobile/i, // Chrome Mobile WebView
-      ];
-
-      const isInApp = inAppPatterns.some(pattern => pattern.test(userAgent));
-      setIsInAppBrowser(isInApp);
-    };
-
-    detectInAppBrowser();
-  }, []);
-
-  // Handle video events
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video || !useTestVideo) return;
-
-    const handleLoadedData = () => {
-      setVideoError(false);
-    };
-
-    const handleError = () => {
-      console.warn('Video failed to load, falling back to image');
-      setVideoError(true);
-    };
-
-    const handleCanPlay = () => {
-      // Try to play the video
-      video.play().catch((error) => {
-        console.warn('Video autoplay failed:', error);
-        setVideoError(true);
-      });
-    };
-
-    video.addEventListener('loadeddata', handleLoadedData);
-    video.addEventListener('error', handleError);
-    video.addEventListener('canplay', handleCanPlay);
-
-    return () => {
-      video.removeEventListener('loadeddata', handleLoadedData);
-      video.removeEventListener('error', handleError);
-      video.removeEventListener('canplay', handleCanPlay);
-    };
-  }, [useTestVideo, language, isMobileView]);
 
   const handleLanguageChange = (language: string) => {
     setLanguage(language);
@@ -131,10 +66,9 @@ export function Landing() {
         } `}
       >
         {/* Conditional rendering based on videoVersion */}
-        {useTestVideo && !videoError && !isInAppBrowser ? (
-          /* Video Banner - Only show when video is supported and not in in-app browser */
+        {useTestVideo ? (
+          /* Video Banner - Only show for Vietnamese language when videoVersion > 0 */
           <video
-            ref={videoRef}
             key={`${language}-${isMobileView ? 'mobile' : 'desktop'}`}
             className="w-full absolute top-0 left-0 right-0"
             autoPlay
@@ -142,13 +76,6 @@ export function Landing() {
             muted
             playsInline
             preload="metadata"
-            webkit-playsinline="true"
-            x5-playsinline="true"
-            x5-video-player-type="h5"
-            x5-video-player-fullscreen="false"
-            controls={false}
-            disablePictureInPicture
-            onError={() => setVideoError(true)}
           >
             <source src={getVideoSource()} type="video/mp4" />
             {/* Fallback image for browsers that don't support video */}
@@ -161,53 +88,6 @@ export function Landing() {
               className="w-full h-full object-contain"
             />
           </video>
-        ) : useTestVideo && isInAppBrowser ? (
-          /* In-app browser fallback - Show image with play button overlay */
-          <div className="relative w-full">
-            <img
-              src={language === 'vi' 
-                ? (isMobileView ? kvBannerViMobile : kvBannerViDesktop)
-                : (isMobileView ? kvBannerEnMobile : kvBannerEnDesktop)
-              }
-              alt="KV Banner"
-              className="w-full h-auto"
-            />
-            <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-20">
-              <button
-                onClick={() => {
-                  // Try to play video when user clicks
-                  if (videoRef.current) {
-                    videoRef.current.play().catch(() => {
-                      console.warn('Video play failed on user interaction');
-                    });
-                  }
-                }}
-                className="bg-white bg-opacity-90 hover:bg-opacity-100 rounded-full p-4 transition-all duration-200"
-                aria-label="Play video"
-              >
-                <svg className="w-8 h-8 text-gray-800" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z"/>
-                </svg>
-              </button>
-            </div>
-            {/* Hidden video element for user interaction */}
-            <video
-              ref={videoRef}
-              className="hidden"
-              loop
-              muted
-              playsInline
-              preload="metadata"
-              webkit-playsinline="true"
-              x5-playsinline="true"
-              x5-video-player-type="h5"
-              x5-video-player-fullscreen="false"
-              controls={false}
-              disablePictureInPicture
-            >
-              <source src={getVideoSource()} type="video/mp4" />
-            </video>
-          </div>
         ) : (
           /* Original Image Banner - Default behavior */
           <img

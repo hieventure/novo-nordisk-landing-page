@@ -19,8 +19,7 @@ import eventInfoVi from '@/assets/event-info-vi.png';
 import eventInfoEn from '@/assets/event-info-en.png';
 import footerVi from '@/assets/footer-vi.png';
 import footerEn from '@/assets/footer-en.png';
-import gifImage from '@/assets/ezgif-62d58624889e3c.gif';
-import kvVideoViMobileWebm from '@/assets/kv-video-vi-mobile-web-m.webm';
+import gifImage from '@/assets/kv-video-en-mobile-ezgif.com-video-to-gif-converter.gif';
 
 import { useState, useEffect } from 'react';
 
@@ -30,7 +29,6 @@ export function Landing() {
   const [language, setLanguage] = useState('vi');
   const [useTestVideo, setUseTestVideo] = useState(false);
   const [useGif, setUseGif] = useState(false);
-  const [useWebM, setUseWebM] = useState(false);
 
   // Check for query parameter on component mount
   useEffect(() => {
@@ -45,12 +43,6 @@ export function Landing() {
 
     if (gif === 'true') {
       setUseGif(true);
-    }
-
-    const webm = urlParams.get('webm');
-
-    if (webm === 'true') {
-      setUseWebM(true);
     }
   }, []);
 
@@ -93,11 +85,6 @@ export function Landing() {
             playsInline
             preload="metadata"
           >
-            {/* WebM source for mobile Vietnamese - better compression */}
-            {isMobileView && language === 'vi' && (
-              <source src={kvVideoViMobileWebm} type="video/webm" />
-            )}
-            {/* MP4 fallback for all cases */}
             <source src={getVideoSource()} type="video/mp4" />
             {/* Fallback image for browsers that don't support video */}
             <img
@@ -109,17 +96,7 @@ export function Landing() {
               className="w-full h-full object-contain"
             />
           </video>
-        ) : useGif ?  <img src={gifImage} alt="KV Banner" className="w-full h-auto" /> : useWebM ? (
-          <video 
-            src={kvVideoViMobileWebm} 
-            className="w-full h-auto" 
-            autoPlay
-            loop
-            muted
-            playsInline
-            preload="metadata"
-          />
-        ) : (
+        ) : useGif ?  <img src={gifImage} alt="KV Banner" className="w-full h-auto" /> : (
           /* Original Image Banner - Default behavior */
           <img
             src={

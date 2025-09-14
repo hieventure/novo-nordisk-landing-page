@@ -19,8 +19,8 @@ import eventInfoVi from '@/assets/event-info-vi.png';
 import eventInfoEn from '@/assets/event-info-en.png';
 import footerVi from '@/assets/footer-vi.png';
 import footerEn from '@/assets/footer-en.png';
-import gifImage from '@/assets/kv-video-en-mobile-ezgif.com-video-to-gif-converter.gif';
-
+import gifImageVi from '@/assets/kv-video-vi-mobile.gif';
+import gifImageEn from '@/assets/kv-video-en-mobile.gif';
 import { useState, useEffect } from 'react';
 
 export function Landing() {
@@ -69,7 +69,9 @@ export function Landing() {
       <div
         className={`relative ${
           useTestVideo
-            ? `w-screen ${isMobileView ? 'pt-[calc(16/9*100%)]' : 'pt-[calc(9/16*100%)]'} overflow-hidden flex items-center justify-center`
+            ? `w-screen ${
+                isMobileView ? 'pt-[calc(16/9*100%)]' : 'pt-[calc(9/16*100%)]'
+              } overflow-hidden flex items-center justify-center`
             : ''
         } `}
       >
@@ -88,15 +90,26 @@ export function Landing() {
             <source src={getVideoSource()} type="video/mp4" />
             {/* Fallback image for browsers that don't support video */}
             <img
-              src={language === 'vi' 
-                ? (isMobileView ? kvBannerViMobile : kvBannerViDesktop)
-                : (isMobileView ? kvBannerEnMobile : kvBannerEnDesktop)
+              src={
+                language === 'vi'
+                  ? isMobileView
+                    ? kvBannerViMobile
+                    : kvBannerViDesktop
+                  : isMobileView
+                  ? kvBannerEnMobile
+                  : kvBannerEnDesktop
               }
               alt="KV Banner"
               className="w-full h-full object-contain"
             />
           </video>
-        ) : useGif ?  <img src={gifImage} alt="KV Banner" className="w-full h-auto" /> : (
+        ) : useGif && isMobileView ? (
+          <img
+            src={language === 'vi' ? gifImageVi : gifImageEn}
+            alt="KV Banner"
+            className="w-full h-auto"
+          />
+        ) : (
           /* Original Image Banner - Default behavior */
           <img
             src={

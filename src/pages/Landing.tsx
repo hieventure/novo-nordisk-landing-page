@@ -19,6 +19,7 @@ import eventInfoVi from '@/assets/event-info-vi.png';
 import eventInfoEn from '@/assets/event-info-en.png';
 import footerVi from '@/assets/footer-vi.png';
 import footerEn from '@/assets/footer-en.png';
+import gifImage from '@/assets/ezgif-62d58624889e3c.gif';
 
 import { useState, useEffect } from 'react';
 
@@ -27,6 +28,7 @@ export function Landing() {
 
   const [language, setLanguage] = useState('vi');
   const [useTestVideo, setUseTestVideo] = useState(false);
+  const [useGif, setUseGif] = useState(false);
 
   // Check for query parameter on component mount
   useEffect(() => {
@@ -35,7 +37,13 @@ export function Landing() {
 
     if (testVideo === 'true') {
       setUseTestVideo(true);
-    } 
+    }
+
+    const gif = urlParams.get('gif');
+
+    if (gif === 'true') {
+      setUseGif(true);
+    }
   }, []);
 
   const handleLanguageChange = (language: string) => {
@@ -88,7 +96,7 @@ export function Landing() {
               className="w-full h-full object-contain"
             />
           </video>
-        ) : (
+        ) : useGif ?  <img src={gifImage} alt="KV Banner" className="w-full h-auto" /> : (
           /* Original Image Banner - Default behavior */
           <img
             src={

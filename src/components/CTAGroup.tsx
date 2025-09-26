@@ -2,7 +2,7 @@
 import { downloadICS, generateICS } from "@/lib/ics";
 import { eventData } from "@/content/event";
 
-export function CTAGroup() {
+export function CTAGroup({ language }: { language: string }) {
   const formatGoogleDate = (isoString: string) => {
     // Returns YYYYMMDDTHHMMSSZ in UTC as required by Google Calendar template
     const d = new Date(isoString);
@@ -269,10 +269,10 @@ export function CTAGroup() {
       {/* Save the Date CTA */}
       <button
         onClick={handleSaveTheDate}
-        className="group sm:w-auto relative bg-cta-gradient text-white font-extrabold text-md sm:text-xl lg:text-ozempic-cta px-2 sm:px-8 py-2 sm:px-12 sm:py-5 rounded-full shadow-cta-inner border border-white/40 transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-gradient-orange/50 min-w-[80px] sm:min-w-[320px] w-[80%] sm:w-[50%]"
+        className="group sm:w-auto relative bg-cta-gradient text-white font-bold text-md sm:text-xl lg:text-ozempic-cta px-2 sm:px-8 py-2 sm:px-12 sm:py-5 rounded-full shadow-cta-inner border border-white/40 transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-gradient-orange/50 min-w-[80px] sm:min-w-[320px] w-[80%] sm:w-[50%]"
         aria-label="Download calendar event for The Power of Less"
       >
-        ADD TO CALENDAR
+        {language === "vi" ? "THÊM SỰ KIỆN VÀO LỊCH" : "ADD TO CALENDAR"}
       </button>
 
       {/* Confirm Attendance CTA */}
@@ -282,7 +282,7 @@ export function CTAGroup() {
         className="group text-center sm:w-auto relative bg-cta-gradient text-white font-bold text-md sm:text-xl lg:text-ozempic-cta px-2 sm:px-8 py-2 sm:px-12 sm:py-5 rounded-full shadow-cta-inner border border-white/40 transition-all duration-300 hover:scale-105 hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-gradient-red/50 min-w-[80px] sm:min-w-[320px] uppercase w-[80%] sm:w-[50%]"
         aria-label="Confirm attendance for The Power of Less event"
       >
-        TÌM HIỂU THÊM THÔNG TIN
+        {language === "vi" ? "TÌM HIỂU THÊM THÔNG TIN" : "FOR MORE INFORMATION"}
       </a>
     </div>
   );

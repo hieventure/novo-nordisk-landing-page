@@ -204,7 +204,7 @@ export function Landing() {
 
         {/* CTAs */}
         <section>
-          <CTAGroup />
+          <CTAGroup language={language} />
         </section>
 
         {/* Disclaimer */}
